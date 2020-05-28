@@ -2,3 +2,8 @@
 __pycache__
 .idea
 .cache
+.DS_Store
+disp.dat
+nodes.dyn
+ultra_driver.m~
+phantom_sym_h_N_58000_seed_0_rand_scat_amp_1_delta_0_0_0_X_-10_10_Y_-5_0_Z_1_30/

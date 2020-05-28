@@ -1,0 +1,16 @@
+%
+% This file describes a typical linear array probe
+%
+
+no_elements	128
+height		0.007
+kerf		0.00002
+width		0.000278
+elv_focus	0.025
+probe_type	linear
+f0		5000000
+bw		70
+wavetype	gaussian
+phase		0
+no_sub_x	1
+no_sub_y	25

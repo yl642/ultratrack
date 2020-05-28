@@ -17,8 +17,8 @@ function ultra_driver(phantom_seed, nodes, dispdat)
 % ------------------PHANTOM PARAMETERS----------------------------
 % setup phantom parameters (PPARAMS)
 % leave any empty to use mesh limit
-generatephantom = logical(1);
-PPARAMS.sym = 'q'; % 'q', 'h', 'none'
+generatephantom = logical(0);
+PPARAMS.sym = 'h'; % 'q', 'h', 'none'
 PPARAMS.xmin=[-0.5];PPARAMS.xmax=[0];	% out-of-plane,cm
 PPARAMS.ymin=[-1.0];PPARAMS.ymax=[1.0];	% lateral, cm \
 PPARAMS.zmin=[-3.0];PPARAMS.zmax=[-0.1];% axial, cm   / X,Y SWAPPED vs FIELD!
@@ -59,7 +59,7 @@ if isempty(d) || generatephantom,
 end
 
 %  --------------IMAGING PARAMETERS---------------------------------
-PARAMS.PROBE ='vf10-5';
+PARAMS.PROBE ='l7-4';
 PARAMS.COMPUTATIONMETHOD = 'none'; % 'cluster','parfor', or 'none'
 
 % setup some Field II parameters
@@ -67,18 +67,18 @@ PARAMS.field_sample_freq = 1e9; % Hz
 PARAMS.c = 1540; % sound speed (m/s)
 
 % TRACKING BEAM PARAMETERS
-PARAMS.XMIN=    0;              % Leftmost scan line (m)
-PARAMS.XSTEP =  0;         % Azimuth step size (m);
-PARAMS.XMAX=    0;	        % Rightmost scan line (m)
+PARAMS.XMIN=    -25/1000;              % Leftmost scan line (m)
+PARAMS.XSTEP =  1/1000;         % Azimuth step size (m);
+PARAMS.XMAX=    25/1000;	        % Rightmost scan line (m)
 PARAMS.THMIN =  0;              % Leftmost azimuth angle (deg)
 PARAMS.THSTEP = 0;              % Azimuth angle step(deg)
 PARAMS.THMAX =  0;              % Rightmost azimuth angle (deg)
 PARAMS.PHIMIN= 0;               % Frontmost elevation angle (deg)
 PARAMS.PHISTEP = 0;             % Elevation angle step(deg)
 PARAMS.PHIMAX= 0;               % Backmost elevation angle (deg)
-PARAMS.YMIN=   0;		        % Frontmost scan line (m)
-PARAMS.YSTEP = 0;               % Elevation step size (m)
-PARAMS.YMAX=   0;	            % Backmost scan line (m)
+PARAMS.YMIN=   -10/1000;		        % Frontmost scan line (m)
+PARAMS.YSTEP = 1/1000;               % Elevation step size (m)
+PARAMS.YMAX=   10/1000;	            % Backmost scan line (m)
 PARAMS.APEX = 0;                % Apex of scan geometry; 0 for linear scanning
 PARAMS.TX_FOCUS= 20.0e-3;       % Tramsmit focus depth (m)
 PARAMS.TX_F_NUM=[1 1];          % Tx F/# (index 2 only used for 2D matrix arrays)

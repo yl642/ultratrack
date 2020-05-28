@@ -17,7 +17,7 @@ phantom.amplitude = double(phantom.amplitude);
 % Select each vector in the beamset and calculate echo signal
 %
 
-
+%pre-allocate memory
 rfdata=zeros(1,beamset.no_beams,beamset.no_beamsy,beamset.no_parallel);
 
 tic
@@ -26,7 +26,7 @@ for n_vector=1:beamset.no_beams;
     if stat_txt,
         disp(sprintf('Processing Vector Lat %d of %d',n_vector, beamset.no_beams));
     end
-    for m_vector = 1.beamset.no_beamsy;
+    for m_vector = 1:beamset.no_beamsy;
         if stat_txt && beamset.no_beamsy>1,
             disp(sprintf('Processing Vector Elev %d of %d', m_vector, beamset.no_beamsy));
         end

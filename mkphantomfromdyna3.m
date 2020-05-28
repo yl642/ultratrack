@@ -119,7 +119,7 @@ for t=PPARAMS.TIMESTEP,
                   scatterers(:,3), 'linear');
     sdZ = interpn(X, Y, Z, dZ, scatterers(:,1), scatterers(:,2), ...
                   scatterers(:,3), 'linear');
-    
+
     % Remove any NaN values from scatterer displacement matrix. NaNs will
     % occur if a scatterers is placed outside of the bounds of the nodal
     % displacement matrix that is passed in.
