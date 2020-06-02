@@ -1,7 +1,7 @@
         phantom = dog;
         figure(2);clf
-        r = ((0:size(rf,1)-1)*(1/probe.field_sample_freq)+t0)*(probe.c/2);
-        [th0 dth] = meshgrid(beamset.directionx,beamset.rx_offset(:,3));
+        r = ((0:size(rf,1)-1)*(1/probe.field_sample_freq)+t0)*(probe.c/2); %depth distance
+        [th0 dth] = meshgrid(beamset.directionx,beamset.rx_offset(:,3)); %non-linear beam & parallel rx
         th = th0+dth;
         [Th R] = meshgrid(th(:),r);
         x0 = beamset.originx;

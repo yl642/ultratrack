@@ -143,7 +143,8 @@ if (beamset(idx).is_dyn_focus),  % If dynamic receive focus mode
        xdc_dynamic_focus(Rx,-inf,theta,phi); %set dyn foc
 else % otherwise setup the fixed receive focus:
     focus_x = x0r+beamset(idx).rx_focus_range*sin(theta)+beamset(idx).rx_offset(vectorp,1);
-    focus_y = y0r+beamset(idx).rx_focus_range*sin(phi)+beamset(idx).rx_offset(vectorp,4);
+    focus_y = y0r+beamset(idx).rx_focus_range*sin(phi)+beamset(idx).rx_offset(vectorp,2);
+%     focus_y = y0r+beamset(idx).rx_focus_range*sin(phi)+beamset(idx).rx_offset(vectorp,4);
     focus_z = beamset(idx).rx_focus_range*cos(theta)*cos(phi);
     xdc_focus(Rx,-inf,[focus_x focus_y focus_z]); % Receive fixed focal point
 end; 
@@ -151,7 +152,7 @@ end;
 if debug_fig
  figure(3);
  if vectorx==1 && vectory==1 && vectorp==1
-   clf;hold all
+    clf;hold all
     for ii = 1:geometry.no_elements_x
         for jj = 1:geometry.no_elements_y
             p(jj,ii) = patch(1e3*(element_position_x(ii) + [-0.5 0.5 0.5 -0.5]*geometry.width_x),[0 0 0 0],1e3*(element_position_y(jj) + [-0.5 -0.5 0.5 0.5]*geometry.width_y),'m','edgecolor','none');
@@ -164,7 +165,7 @@ if debug_fig
     axis ij
     hold all
     plot3(0,1e3*beamset.apex,0,'b*','MarkerSize',10)
-    end
+ end
 k = get(gca,'children');
 k = k(end-[0:geometry.no_elements_x*geometry.no_elements_y-1]);
 k = reshape(k,geometry.no_elements_y,geometry.no_elements_x);
@@ -192,35 +193,65 @@ end
 % pitch=geometry.width+geometry.kerf_x;
 % element_position_x=(0.5+(0:(geometry.no_elements_x-1)))*pitch-offset_X;
 
-for n=1:512,
-    ap_times(n,1)=2*beamset(idx).rx_f_num(1)*pitch*(n-1)/SPEED_OF_SOUND;
+% for n=1:512
+%     ap_times(n,1)=2*beamset(idx).rx_f_num(1)*pitch*(n-1)/SPEED_OF_SOUND;
+% 
+%     rx_width=n*pitch;
+%     
+%     %Added lateral || rx offset (Pete, 2012.11.2)
+%     rx_ap_left_limit =-rx_width/2+x0r;
+%     rx_ap_right_limit= rx_width/2+x0r;;
+% 
+%     rx_apodization(n,:)= double((element_position_x>=rx_ap_left_limit) & ...
+%         (element_position_x<=rx_ap_right_limit));
+% 
+%     % check to see if no elements are on, and if so, at least turn the center
+%     % element on
+%     if ~any(rx_apodization(n,:))
+%         warning(['No elements in the apodized Rx aperture weighted on; '...
+%                  'center element turned on.'])
+%         center_element = floor(size(rx_apodization,2));
+%         rx_apodization(n,center_element) = 1;
+%     end
+% 
+%     if (beamset(idx).rx_apod_type==1) % If using a hamming window
+%         rx_apodization(n,:)=rx_apodization(n,:).*(0.54+0.46*cos(2*pi*...
+%             (element_position_x-x0r)/rx_width));
+%     end;
+% end;
+% 
+% if(~(strcmp(geometry.probe_type,'matrix'))),
+%     xdc_apodization(Rx,ap_times,rx_apodization)
+% else,
+%     warning('Apodization not supported for matrix probes; no Rx apodization applied.');
+% end;
 
-    rx_width=n*pitch;
-    
-    %Added lateral || rx offset (Pete, 2012.11.2)
-    rx_ap_left_limit =-rx_width/2+x0r;
-    rx_ap_right_limit= rx_width/2+x0r;;
+rx_width_x=abs(beamset(idx).tx_focus_range)/beamset(idx).rx_f_num(1);
+rx_width_y=abs(beamset(idx).tx_focus_range)/beamset(idx).rx_f_num(2);
 
-    rx_apodization(n,:)= double((element_position_x>=rx_ap_left_limit) & ...
-        (element_position_x<=rx_ap_right_limit));
+rx_ap_left_limit_x =-rx_width_x/2+x0r;
+rx_ap_right_limit_x= rx_width_x/2+x0r;
 
-    % check to see if no elements are on, and if so, at least turn the center
-    % element on
-    if ~any(rx_apodization(n,:))
-        warning(['No elements in the apodized Rx aperture weighted on; '...
-                 'center element turned on.'])
-        center_element = floor(size(rx_apodization,2));
-        rx_apodization(n,center_element) = 1;
-    end
+rx_ap_left_limit_y =-rx_width_y/2+y0r;
+rx_ap_right_limit_y= rx_width_y/2+y0r;
 
-    if (beamset(idx).rx_apod_type==1) % If using a hamming window
-        rx_apodization(n,:)=rx_apodization(n,:).*(0.54+0.46*cos(2*pi*...
-            (element_position_x-x0r)/rx_width));
-    end;
-end;
+rx_apodization_x= double((element_position_x>=rx_ap_left_limit_x) & ...
+    (element_position_x<=rx_ap_right_limit_x));
+rx_apodization_y= double((element_position_y>=rx_ap_left_limit_y) & ...
+    (element_position_y<=rx_ap_right_limit_y));
 
-if(~(strcmp(geometry.probe_type,'matrix'))),
-    xdc_apodization(Rx,ap_times,rx_apodization)
-else,
-    warning('Apodization not supported for matrix probes; no Rx apodization applied.');
-end;
+
+if (beamset(idx).rx_apod_type==1) % If using a hamming window
+    rx_apodization_x=rx_apodization_x.*(0.54+0.46*cos(2*pi*...
+        (element_position_x-x0r)/rx_width_x));
+end
+if (beamset(idx).rx_apod_type==1) % If using a hamming window
+    rx_apodization_y=rx_apodization_y.*(0.54+0.46*cos(2*pi*...
+        (element_position_y-y0r)/rx_width_y));
+end
+[Aprx, Apry] = meshgrid(rx_apodization_x,rx_apodization_y); %mesh across the positions
+rx_apodization = Aprx.*Apry;
+
+rx_apodization=reshape(rx_apodization,[1,size(rx_apodization_x,2)*size(rx_apodization_y,2)]);
+
+xdc_apodization(Rx,-inf,rx_apodization)

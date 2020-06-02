@@ -65,7 +65,7 @@ else,
     V(i) = sum(abs(hilbert(v))); %A rough estimate of scatterer contribution - probably could be improved
     end
 
-    V = convn(V,ones(3,3,3)./9,'same');
+    V = convn(V,ones(3,3,3)./9,'same'); %PSF?
     V = db(V./max(V(:)));
 
      P = [2 1 3];
@@ -74,7 +74,9 @@ else,
        Z = permute(Z, P);
        V = permute(V, P);
 
-    V1 = interp3(Z,X,Y,V,double(phantom.position(:,3)),double(phantom.position(:,1)),double(phantom.position(:,2)),'nearest');
+    V1 = interp3(Z,X,Y,V,double(phantom.position(:,3)), ...
+                         double(phantom.position(:,1)), ...
+                         double(phantom.position(:,2)),'nearest');
 
     keepers = V1>minDB | phantom.amplitude>1;
 
