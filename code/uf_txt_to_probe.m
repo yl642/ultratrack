@@ -1,4 +1,4 @@
-function [geometry]=uf_txt_to_probe(filename);
+function [geometry]=uf_txt_to_probe(filename)
 %
 % UF_TXT_TO_PROBE   Creates probe struct from probe text data file
 %   function [probe]=uf_txt_to_probe(filename) returns a probe structure
@@ -24,7 +24,7 @@ function [geometry]=uf_txt_to_probe(filename);
 %       phase           Phase of carrier relative to the pulse envelope
 %       wavetype        'gaussian'
 %
-%   Other entries will be ignored with a warning.  Comments my be included
+%   Other entries will be ignored with a warning.  Comments maybe included
 %   in the file by prefaceing with a % sign (Matlab style commenting)
 %
 % 10/21/2004, Stephen McAleavey, U. Rochester BME
@@ -41,10 +41,11 @@ function [geometry]=uf_txt_to_probe(filename);
 %spaces, tabs and equal signs may all be used to seperate columns.  See the
 %case statement below for the parameter names 
 [pparam,pvalue]=textread(filename,'%s %s %*[^\n]','commentstyle','matlab','whitespace','= \b\t');
+% %*[^\n] skipping the rest of the line
 % Deal with file-errors!!
 
 % load geometry structure with data
-for n=1:size(pparam,1),
+for n=1:size(pparam,1)
     switch lower(pparam{n})
         case {'no_elements'} % Number of elements
             geometry.no_elements = str2num(pvalue{n});
@@ -84,24 +85,24 @@ for n=1:size(pparam,1),
             geometry.no_sub_y = str2num(pvalue{n});
         otherwise % Announce and Ignore any other parameters
             disp(['Unknown parameter "' pparam{n} '" in probe file ' filename ' ignored']);
-    end;
-end;
+    end
+end
 
-if ~isfield(geometry,'no_elements_x') && isfield(geometry,'no_elements');
+if ~isfield(geometry,'no_elements_x') && isfield(geometry,'no_elements')
     geometry.no_elements_x = geometry.no_elements;
 end
-if ~isfield(geometry,'no_elements_y');
+if ~isfield(geometry,'no_elements_y')
     geometry.no_elements_y = 1;
 end
-if ~isfield(geometry,'width_x') && isfield(geometry,'width');
+if ~isfield(geometry,'width_x') && isfield(geometry,'width')
     geometry.width_x = geometry.width;
 end
-if ~isfield(geometry,'kerf_x') && isfield(geometry,'kerf');
+if ~isfield(geometry,'kerf_x') && isfield(geometry,'kerf')
     geometry.kerf_x = geometry.kerf;
 end
-if ~isfield(geometry,'width_y') && isfield(geometry,'height');
+if ~isfield(geometry,'width_y') && isfield(geometry,'height')
     geometry.width_y = geometry.height;
 end
-if ~isfield(geometry,'kerf_y') && isfield(geometry,'kerf');
+if ~isfield(geometry,'kerf_y') && isfield(geometry,'kerf')
     geometry.kerf_y = geometry.kerf;
 end

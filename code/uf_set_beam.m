@@ -1,3 +1,4 @@
+
 function toffset = uf_set_beam(Tx,Rx,geometry,beamset,idx,vectorx,vectory,vectorp)
 %
 %	uf_set_vector(Tx,Rx,beamset,set,vector)
@@ -55,8 +56,10 @@ element_position_y=(0.5+(0:(geometry.no_elements_y-1)))*pitch-offset_Y;
 % Mark 06/17/05
 
 xdc_excitation(Tx,uf_txp(beamset(idx).tx_excitation,geometry.field_sample_freq));  % Transmit pulser waveform
-
-x0t = beamset(idx).originx(vectorx)-beamset(idx).apex*(tan(beamset(idx).directionx(vectorx)));
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+x0t = beamset(idx).originx(vectorx)-beamset(idx).apex*(tan(beamset(idx).directionx(vectorx))); % used to set apodization
 y0t = beamset(idx).originy(vectory)-beamset(idx).apex*(tan(beamset(idx).directiony(vectory)));
 z0t = beamset(idx).apex;
 
@@ -69,8 +72,8 @@ xdc_center_focus(Tx,[x0t,y0t,z0t]);
 % the xdf_focus() command below.
 % Mark 06/17/05
 
-focus_x= beamset(idx).tx_focus_range*sin(beamset(idx).directionx(vectorx))+x0t;
-focus_y= beamset(idx).tx_focus_range*sin(beamset(idx).directiony(vectory))+y0t;
+focus_x= beamset(idx).tx_focus_range*sin(beamset(idx).directionx(vectorx)) + x0t;
+focus_y= beamset(idx).tx_focus_range*sin(beamset(idx).directiony(vectory)) + y0t;
 focus_z= beamset(idx).tx_focus_range*cos(beamset(idx).directionx(vectorx))*cos(beamset(idx).directiony(vectory));
 
 xdc_focus(Tx,0,[focus_x focus_y focus_z]);
@@ -89,7 +92,9 @@ else
 end
 
 xdc_times_focus(Tx,-inf,reshape(dly',1,[]));
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Tx Apodization
 tx_width=abs(beamset(idx).tx_focus_range)/beamset(idx).tx_f_num(1);
 
@@ -98,7 +103,7 @@ tx_ap_right_limit= tx_width/2+x0t;
 tx_apodization_x= double((element_position_x>tx_ap_left_limit) & (element_position_x<tx_ap_right_limit));
 if (beamset(idx).tx_apod_type==1) % If using a hamming window for the tx apodization,
     tx_apodization_x=tx_apodization_x.*(0.54+0.46*cos(2*pi*(element_position_x-x0t)/tx_width));
-end;
+end
 
 if length(beamset(idx).tx_f_num) == 1
     beamset(idx).tx_f_num(2) = beamset(idx).tx_f_num(1);
@@ -111,21 +116,25 @@ tx_ap_top_limit= tx_height/2+y0t;
 tx_apodization_y= double((element_position_y>tx_ap_bottom_limit) & (element_position_y<tx_ap_top_limit));
 if (beamset(idx).tx_apod_type==1) % If using a hamming window for the tx apodization,
     tx_apodization_y=tx_apodization_y.*(0.54+0.46*cos(2*pi*(element_position_y-y0t)/tx_height));
-end;
+end
 
 [Apx Apy] = meshgrid(tx_apodization_x,tx_apodization_y);
 tx_apodization = Apx.*Apy;
 
-if(~(strcmp(geometry.probe_type,'matrix'))),
+if(~(strcmp(geometry.probe_type,'matrix')))
     xdc_apodization(Tx,0,tx_apodization);
-else,
+else
     warning('Apodization not supported for matrix probes; no Tx apodization applied.');
-end;
+end
 
 % Settings for receive aperture:
 if ~exist('pvector','var')
     pvector = 1;
 end
+
+%--tx---above
+
+%--rx---down
 
 %Removed image mode check. Linear and Phased modes shouldn't differ as 
 %beams are explicitly specified by apex, origin, and angle(Pete 2012.11.2)
@@ -139,15 +148,15 @@ phi = beamset(idx).directiony(vectory)+beamset(idx).rx_offset(vectorp,4);
 xdc_center_focus(Rx,[x0r y0r z0r]);
     
 % Added || RX offset functionality (Pete 2012.11.2)
-if (beamset(idx).is_dyn_focus),  % If dynamic receive focus mode
-       xdc_dynamic_focus(Rx,-inf,theta,phi); %set dyn foc
+if (beamset(idx).is_dyn_focus)  % If dynamic receive focus mode
+    xdc_dynamic_focus(Rx,-inf,theta,phi); %set dyn foc
 else % otherwise setup the fixed receive focus:
     focus_x = x0r+beamset(idx).rx_focus_range*sin(theta)+beamset(idx).rx_offset(vectorp,1);
     focus_y = y0r+beamset(idx).rx_focus_range*sin(phi)+beamset(idx).rx_offset(vectorp,2);
 %     focus_y = y0r+beamset(idx).rx_focus_range*sin(phi)+beamset(idx).rx_offset(vectorp,4);
     focus_z = beamset(idx).rx_focus_range*cos(theta)*cos(phi);
     xdc_focus(Rx,-inf,[focus_x focus_y focus_z]); % Receive fixed focal point
-end; 
+end 
 
 if debug_fig
  figure(3);
@@ -210,7 +219,8 @@ end
 %     if ~any(rx_apodization(n,:))
 %         warning(['No elements in the apodized Rx aperture weighted on; '...
 %                  'center element turned on.'])
-%         center_element = floor(size(rx_apodization,2));
+% %         center_element = floor(size(rx_apodization,2));
+%         center_element = floor(size(rx_apodization,2)/2);
 %         rx_apodization(n,center_element) = 1;
 %     end
 % 

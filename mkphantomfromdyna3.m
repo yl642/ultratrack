@@ -43,8 +43,8 @@ FD_RATIO=0.01;  % What to mutiply dyna units by (cm) to
 			    % get field units (m), here 100cm*0.01=1m
 
 % Read the .dyn file to get node positions
-disp(sprintf('Loading %s...',DYN_FILE));
-[nodes, X, Y, Z] = read_dot_dyn(DYN_FILE);
+fprintf('Loading %s...\n',DYN_FILE);
+[nodes, X, Y, Z] = read_dot_dyn(DYN_FILE); % read from FEM
 
 % Create scatterers in specified volume with explicitly seeded random generator
 % to ensure identical scatterer location in subsequent runs if needed
@@ -57,8 +57,8 @@ scatterers(:,3) = scatterers(:,3) * (PPARAMS.zmax - PPARAMS.zmin) + PPARAMS.zmin
 % add rigid displacement to scatterers before shift
 scatterers = scatterers + (ones(PPARAMS.N,1) * PPARAMS.delta);
 
-if(exist(ZDISPFILE, 'file') == 0),
-    error(sprintf('%s does not exist.', ZDISPFILE));
+if(exist(ZDISPFILE, 'file') == 0)
+    error('%s does not exist.', ZDISPFILE);
 else
     zdisp_fid = fopen(ZDISPFILE, 'r');
 end
@@ -68,20 +68,20 @@ NUM_DIMS = fread(zdisp_fid, 1, 'float32');
 NUM_TIMESTEPS = fread(zdisp_fid, 1, 'float32');
 
 % Decide on timesteps to use
-if isempty(PPARAMS.TIMESTEP), 
+if isempty(PPARAMS.TIMESTEP)
     PPARAMS.TIMESTEP=1:NUM_TIMESTEPS;
 end
 
-word_size = 4;
+word_size = 4; %float32
 header_bytes = 3*word_size;
 first_timestep_words = NUM_NODES*NUM_DIMS;
-first_timestep_bytes = NUM_NODES*(NUM_DIMS)*word_size
-timestep_bytes = NUM_NODES*(NUM_DIMS-1)*word_size
+first_timestep_bytes = NUM_NODES*(NUM_DIMS)*word_size; %NUM_DIMS = 4: id, x, y, z
+timestep_bytes = NUM_NODES*(NUM_DIMS-1)*word_size;
 
 % Generate displaced scatterers for each timestep
-for t=PPARAMS.TIMESTEP,
+for t=PPARAMS.TIMESTEP
     % Get the displacement matricies
-    disp(sprintf('Extracting displacements for timestep %d...',t));
+    fprintf('Extracting displacements for timestep %d...\n',t);
     if (t == 1) || LEGACY_NODES
         
         % extract the zdisp values for the appropriate time step
@@ -98,9 +98,8 @@ for t=PPARAMS.TIMESTEP,
         zdisp_slice = [node_readout zdisp_slice];
     end
     
-    if (strcmp(PPARAMS.sym, 'q') | strcmp(PPARAMS.sym, 'h')) & ...
-            (t == PPARAMS.TIMESTEP(1)),
-        [X, Y, Z] = reflect_node_coord_disp('coord', PPARAMS.sym, X, Y, Z);
+    if (strcmp(PPARAMS.sym, 'q') || strcmp(PPARAMS.sym, 'h')) && (t == PPARAMS.TIMESTEP(1))
+        [X, Y, Z] = reflect_node_coord_disp('coord', PPARAMS.sym, X, Y, Z); % reflect FEM
     end
     
     % Rearrange the displacement matrix into three 3D matrices corresponding to
@@ -108,7 +107,7 @@ for t=PPARAMS.TIMESTEP,
     [dX, dY, dZ] = reform_zdisp_slice(zdisp_slice, nodes);
     clear zdisp_slice
     
-    if (strcmp(PPARAMS.sym, 'q') | strcmp(PPARAMS.sym, 'h')),
+    if (strcmp(PPARAMS.sym, 'q') || strcmp(PPARAMS.sym, 'h'))
         [dX, dY, dZ] = reflect_node_coord_disp('disp', PPARAMS.sym, dX, dY, dZ);
     end
     
@@ -136,10 +135,14 @@ for t=PPARAMS.TIMESTEP,
     phantom.position = phantom.position(:, [2 1 3]);
     
     % Insert amplitudes for scatterers
-    % Have uniform amplitude, but can set to something other than 1 (e.g., 0,
-    % to only have point scatteres (below))
-    rng(PPARAMS.seed);
-    phantom.amplitude = PPARAMS.rand_scat_amp .* randn(size(scatterers,1),1);
+    % Have uniform amplitude (if NaN), but can set to something other than 1 
+    % (e.g., 0, to only have point scatteres (below))
+    if isnan(PPARAMS.rand_scat_amp)
+        phantom.amplitude = ones(size(scatterers,1), 1);
+    else
+        rng(PPARAMS.seed);
+        phantom.amplitude = PPARAMS.rand_scat_amp .* randn(size(scatterers,1),1);
+    end
     
     
     %Include evenly spaced bright scatterers (if requested)
@@ -163,7 +166,7 @@ for t=PPARAMS.TIMESTEP,
 	% save phantom to file
     save(sprintf('%s%03d', OUTPUT_NAME, t), 'phantom')
 
-end; % end time loop
+end % end time loop
 
 fclose(zdisp_fid);
 
@@ -171,6 +174,6 @@ fclose(zdisp_fid);
 % output PPARAMS to it.
 if (nargout>0)
     varargout={PPARAMS};
-end;
+end
 
 disp('Done.');

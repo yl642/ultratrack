@@ -1,4 +1,4 @@
-function [node_loc,X,Y,Z] = read_dot_dyn(fname);
+function [node_loc,X,Y,Z] = read_dot_dyn(fname)
 
 % function [nodes,X,Y,Z] = read_dot_dyn(fname);                     
 %
@@ -20,30 +20,30 @@ function [node_loc,X,Y,Z] = read_dot_dyn(fname);
 % Mark 04/01/08
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-endofline=sprintf('\n');
+endofline=newline;
   
 % Load grid data
   
 % Open file
 fid=fopen(fname,'r');
-if (fid == -1),
+if (fid == -1)
 	disp(['Can''t open ' fname]);
 	return;
-	end;
+end
  
 % find last word just before data... 
 s=fscanf(fid,'%s',1);
-while (~strcmp(s,'*NODE')),
+while (~strcmp(s,'*NODE'))
 	s=fscanf(fid,'%s',1);
-	end;
+end
 
 % Find start of next line...        
 c=fscanf(fid,'%c',1);
-while(c~=endofline);
+while(c~=endofline)
 	c=fscanf(fid,'%c',1);
-	end;
+end
 % Suck in data...  
-[node_loc,count]=fscanf(fid,'%d,%f,%f,%f',[4,inf]);
+[node_loc,~]=fscanf(fid,'%d,%f,%f,%f',[4,inf]);
 node_loc=node_loc';
 fclose(fid);
 
@@ -65,15 +65,16 @@ TOL=3; % One might calculate TOL from the data by finding the range of
 
 n2=node_loc;
 n2(:,2:4)=round((10^TOL)*n2(:,2:4))/(10^TOL);
-[n2,I]=sortrows(n2,[4 3 2]);
+% [n2,I]=sortrows(n2,[4 3 2]);
+[n2,~]=sortrows(n2,[4 3 2]);
 
 % node_loc now is sorted into the same order, preserving the orginal 
 % (unrounded) values.
 
-node_loc=node_loc(I,:);
+% node_loc=node_loc(I,:);
 node_loc=n2;
 
-% figure out dimensions
+% figure out dimensions, evenly spaced
 zsum=sum(n2(:,4)==n2(1,4));
 zdim=size(n2,1)/zsum;
 ysum=sum(n2(1:zsum,3)==n2(1,3));

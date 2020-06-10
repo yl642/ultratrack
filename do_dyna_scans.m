@@ -1,4 +1,4 @@
-function do_dyna_scans(PHANTOM_FILE,OUTPUT_FILE,PARAMS);
+function do_dyna_scans(PHANTOM_FILE,OUTPUT_FILE,PARAMS)
 %
 % do_dyna_scans(PHANTOM_FILE,OUTPUT_FILE,PARAMS);
 %
@@ -74,18 +74,18 @@ probe.c = PARAMS.c;
 
 % enabled matrix array elements (only for 2D matrix arrays!)
 % 2D matrix of 0s (off) and 1s (on) that is no_ele_x x no_ele_y in dimension
-if(strcmp(probe.probe_type,'matrix')),
-    [probe.tx_enabled]=def_matrix_enabled(probe.no_elements_x,TX_FNUM(1),probe.width+probe.kerf_x,probe.no_elements_y,TX_FNUM(2),probe.height+probe.kerf_y,TX_FOCUS)
-    [probe.rx_enabled]=def_matrix_enabled(probe.no_elements_x,RX_FNUM(1),probe.width+probe.kerf_x,probe.no_elements_y,RX_FNUM(2),probe.height+probe.kerf_y,RX_FOCUS)
-end;
+if(strcmp(probe.probe_type,'matrix'))
+    [probe.tx_enabled]=def_matrix_enabled(probe.no_elements_x,TX_FNUM(1),probe.width+probe.kerf_x,probe.no_elements_y,TX_FNUM(2),probe.height+probe.kerf_y,TX_FOCUS);
+    [probe.rx_enabled]=def_matrix_enabled(probe.no_elements_x,RX_FNUM(1),probe.width+probe.kerf_x,probe.no_elements_y,RX_FNUM(2),probe.height+probe.kerf_y,RX_FOCUS);
+end
 
 % Create beamset based on params above
 beamset.type='B';
 beamset.originx=BEAM_ORIGIN_X';
 beamset.originy=BEAM_ORIGIN_Y';
-if(length(beamset.originy)==0);
+if(isempty(beamset.originy))
    beamset.originy=0;
-end;
+end
 beamset.directionx=BEAM_ANGLE_X';
 beamset.directiony=BEAM_ANGLE_Y';
 
@@ -136,15 +136,15 @@ if isempty(slashes)
     phantom_name=PHANTOM_FILE;
 else
     phantom_name=PHANTOM_FILE((max(slashes+1):end));
-end;
+end
 
 %Generate list of all files matching PHANTOM_FILE prefix
 phantom_files=dir([PHANTOM_FILE '*']);
 
 % Abort with message if there are no files found
-if isempty(phantom_files),
+if isempty(phantom_files)
     error('No phantom files found matching name given');
-end;
+end
 
 switch lower(PARAMS.COMPUTATIONMETHOD)
     case 'cluster'
@@ -163,9 +163,13 @@ switch lower(PARAMS.COMPUTATIONMETHOD)
         datafile = fullfile(pth,ID);
         save(datafile, 'phantom_files', 'phantom_path', 'phantom_name', ...
                        'probe', 'beamset', 'OUTPUT_FILE');
-        nProc = matlabpool('size');
+%         nProc = matlabpool('size');
+%         if nProc == 0
+%             matlabpool('open')
+%         end
+        nProc = parpool('size');
         if nProc == 0
-            matlabpool('open')
+            parpool('open')
         end
         tic
         parfor n =1:length(phantom_files)
@@ -177,9 +181,9 @@ switch lower(PARAMS.COMPUTATIONMETHOD)
 
         toc
     otherwise
-        for n=1:length(phantom_files), % For each file,
+        for n=1:length(phantom_files) % For each file,
             tstep=sscanf(phantom_files(n).name, [phantom_name '%03d']);
-            if isempty(tstep),
+            if isempty(tstep)
                 % Warn that we're skipping a file
                 warning(['Skipping ' phantom_files(n).name]);
             else
@@ -208,8 +212,8 @@ switch lower(PARAMS.COMPUTATIONMETHOD)
                 % Save the result
                 save(sprintf('%s%03d', OUTPUT_FILE, n), 'rf', 't0');
                 
-            end; % matches if isempty(tstep)
-        end;
+            end % matches if isempty(tstep)
+        end
         
 end
 
@@ -247,14 +251,14 @@ function [active_min,active_max]=def_active_min_max_ele_ids(num_ele,focal_depth,
     active_max = center_element_id + floor(active_elements/2);
 
     % check to make sure that the min and max ids don't exceed the number of physical elements
-    if (active_min < 1),
+    if (active_min < 1)
         warning('Matrix Min Element < 1; being set to 1.  Check matrix definition.');
         active_min = 1;
-    end;
+    end
 
-    if(active_max > num_ele),
+    if(active_max > num_ele)
         warning('Matrix Max Element > NUM_ELE; being set to NUM_ELE.  Check matrix definition.');
         active_max = num_ele;
-    end;
+    end
 
 end

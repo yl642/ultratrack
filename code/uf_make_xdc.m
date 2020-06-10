@@ -23,7 +23,7 @@ function [Tx,Rx]=uf_make_xdc(geometry)
 
 set_field('fs',geometry.field_sample_freq);
 
-if (strcmp('linear',geometry.probe_type) | strcmp('phased',geometry.probe_type)),
+if (strcmp('linear',geometry.probe_type) || strcmp('phased',geometry.probe_type))
 
 	% Set up a linear or phased array
 
@@ -37,7 +37,7 @@ if (strcmp('linear',geometry.probe_type) | strcmp('phased',geometry.probe_type))
 	xdc_impulse(Tx,uf_ir(geometry));
 	xdc_impulse(Rx,uf_ir(geometry));
 
-elseif strcmp('curvilinear',geometry.probe_type),
+elseif strcmp('curvilinear',geometry.probe_type)
 
 	% Set up a curvilinear array
 
@@ -54,7 +54,7 @@ elseif strcmp('curvilinear',geometry.probe_type),
 % v2.5.0 - matrix probe additions
 % Mark Palmeri (mlp6@duke.edu)
 % 2012-09-04
-elseif strcmp('matrix',geometry.probe_type),
+elseif strcmp('matrix',geometry.probe_type)
         % the 'focus' variable gets set if uf_set_beam.m, so I am just making
         % it [0 0 10] for now (this is completely arbitrary)
         Tx = xdc_2d_array(geometry.no_elements_x,geometry.no_elements_y,geometry.width,geometry.height,geometry.kerf_x,geometry.kerf_y,geometry.tx_enabled,geometry.no_sub_x,geometry.no_sub_y,[0 0 10]);

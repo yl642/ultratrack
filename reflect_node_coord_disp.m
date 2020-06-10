@@ -1,4 +1,4 @@
-function [Xr, Yr, Zr] = reflect_node_coord_disp(dtype, sym, X, Y, Z, debug);
+function [Xr, Yr, Zr] = reflect_node_coord_disp(dtype, sym, X, Y, Z, debug)
 % function [Xr, Yr, Zr] = reflect_node_coord_disp(dtype, sym, X, Y, Z, debug);
 %
 % reflect quarter and half symmetry mesh node coordinates for full volume
@@ -17,14 +17,14 @@ function [Xr, Yr, Zr] = reflect_node_coord_disp(dtype, sym, X, Y, Z, debug);
 %           Zr (3D float) - reflected Z coordinates
 %
 
-if ~exist('debug', 'var'),
+if ~exist('debug', 'var')
     debug = 0;
-end;
+end
 
-if debug == 1,
-    Xorig = reshape(X, [prod(size(X)), 1]);
-    Yorig = reshape(Y, [prod(size(Y)), 1]);
-    Zorig = reshape(Z, [prod(size(Z)), 1]);
+if debug == 1
+    Xorig = reshape(X, [numel(X), 1]);
+    Yorig = reshape(Y, [numel(Y), 1]);
+    Zorig = reshape(Z, [numel(Z), 1]);
     figure;
     hold on
     plot3(Xorig, Yorig, Zorig, 'ko');
@@ -57,10 +57,10 @@ switch sym
         Zr = cat(2, flipdim(Zr(:,2:end,:),2), Zr);
 end
 
-if debug == 1,
-    Xnew = reshape(Xr, [prod(size(Xr)), 1]);
-    Ynew = reshape(Yr, [prod(size(Yr)), 1]);
-    Znew = reshape(Zr, [prod(size(Zr)), 1]);
+if debug == 1
+    Xnew = reshape(Xr, [numel(Xr), 1]);
+    Ynew = reshape(Yr, [numel(Yr), 1]);
+    Znew = reshape(Zr, [numel(Zr), 1]);
     plot3(Xnew, Ynew, Znew, 'rx');
 end
 

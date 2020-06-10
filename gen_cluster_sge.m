@@ -1,15 +1,15 @@
 function sgefilename = gen_cluster_sge(Function_Name, Max_Index, UniqueID, Memory_Limit)
 % function sgefilename = gen_cluster_sge(Function_Name, Max_Index, UniqueID, Memory_Limit)
 
-fid = fopen('cluster_template.sge', 'rt');
+fid = fopen('cluster_template.sge', 'rt'); %open files in text mode
 s = fread(fid);
 fclose(fid);
 
-if ~exist('UniqueID','var'),
+if ~exist('UniqueID','var')
     [pth UniqueID] = fileparts(tempname('.'));
 end
 
-if ~exist('Memory_Limit','var'),
+if ~exist('Memory_Limit','var')
     Memory_Limit = 8; % GB
 end
 

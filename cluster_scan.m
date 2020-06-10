@@ -9,7 +9,7 @@ addpath(FIELD_PATH);
 field_init(-1)
 
 	tstep=sscanf(phantom_files(n).name,[phantom_name '%03d']);
-	if isempty(tstep),
+	if isempty(tstep)
 		% Warn that we're skipping a file
 		warning(['Skipping ' phantom_files(n).name]);
 	else
@@ -34,15 +34,15 @@ field_init(-1)
 		rf=[zeros(round(t0*probe.field_sample_freq),beamset.no_beams,beamset.no_beamsy,beamset.no_parallel);rf];
 		t0=0;
 
-                % convert to single precision
-                rf = single(rf);
-                t0 = single(t0);
+        % convert to single precision
+        rf = single(rf);
+        t0 = single(t0);
 
 		% Save the result
         rffile = sprintf('%s%03d',OUTPUT_FILE,n);
 		save(rffile,'rf','t0');
 
-	end; % matches if isempty(tstep)
+    end % matches if isempty(tstep)
 
     %delete temporary file if you are the last one to finish.
     d = dir([OUTPUT_FILE '*.mat']);

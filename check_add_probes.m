@@ -1,6 +1,6 @@
 function check_add_probes(probesPath)
-if exist(probesPath),
+if exist(probesPath, 'dir')
     addpath(probesPath);
-else,
+else
     warning('Probe definitions do not exist; must create your own');
-end;
+end

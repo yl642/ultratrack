@@ -21,9 +21,9 @@ function [PARAMS] = parallel_tx_rx(TX_BEAM_OVERRIDE, PARALLEL_OVERRIDE, PARAMS)
 %   [1x1]   [1xN]   - specify each angle, use same origin
 %
 
-TX_BEAM_OVERRIDE = logical(0);
+TX_BEAM_OVERRIDE = false;
 
-if TX_BEAM_OVERRIDE,
+if TX_BEAM_OVERRIDE
     PARAMS.BEAM_ORIGIN_X = 0;
     PARAMS.BEAM_ORIGIN_Y = 0;
     PARAMS.BEAM_ANGLE_X = 0;
@@ -34,16 +34,16 @@ else
     PARAMS.BEAM_ANGLE_X = PARAMS.THMIN:PARAMS.THSTEP:PARAMS.THMAX;
     PARAMS.BEAM_ANGLE_Y = PARAMS.PHIMIN:PARAMS.PHISTEP:PARAMS.PHIMAX;
     
-    if PARAMS.XSTEP == 0;
+    if PARAMS.XSTEP == 0
         PARAMS.BEAM_ORIGIN_X = (PARAMS.XMIN + PARAMS.XMAX)/2;
     end
-    if PARAMS.YSTEP == 0;
+    if PARAMS.YSTEP == 0
         PARAMS.BEAM_ORIGIN_Y = (PARAMS.YMIN + PARAMS.YMAX)/2;
     end
-    if PARAMS.THSTEP == 0;
+    if PARAMS.THSTEP == 0
         PARAMS.BEAM_ANGLE_X = (PARAMS.THMIN + PARAMS.THMAX)/2;
     end
-    if PARAMS.PHISTEP == 0;
+    if PARAMS.PHISTEP == 0
         PARAMS.BEAM_ANGLE_Y = (PARAMS.PHIMIN + PARAMS.PHIMAX)/2;
     end
 end
@@ -55,14 +55,14 @@ PARAMS.BEAM_ANGLE_Y = deg2rad(PARAMS.BEAM_ANGLE_Y);
 if length(PARAMS.BEAM_ANGLE_X) > 1 && ...
     length(PARAMS.BEAM_ORIGIN_X) > 1 && ...
     length(PARAMS.BEAM_ORIGIN_X) ~= ...
-    length(PARAMS.BEAM_ANGLE_X);
+    length(PARAMS.BEAM_ANGLE_X)
     error('BEAM_ORIGIN_X and BEAM_ANGLE_X cannot both be vectors and have different lengths.')
 end
 
 if length(PARAMS.BEAM_ANGLE_Y) > 1 && ...
     length(PARAMS.BEAM_ORIGIN_Y) > 1 && ...
     length(PARAMS.BEAM_ORIGIN_Y) ~= ...
-    length(PARAMS.BEAM_ANGLE_Y);
+    length(PARAMS.BEAM_ANGLE_Y)
     error('BEAM_ORIGIN_Y and BEAM_ANGLE_Y cannot both be vectors and have different lengths.')
 end
 

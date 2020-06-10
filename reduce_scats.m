@@ -37,13 +37,13 @@ if ~exist('minDB','var')
     minDB = -20;
 end
 
-if isnan(minDB),
+if isnan(minDB)
     fprintf('[%s] Skipping scatterer field reduction.\n', mfilename);
-else,
+else
     fprintf('Reducing Scatter Field to %0.0f dB limit.\n', minDB);
 
     latmin = phantom.PPARAMS.ymin*1e-2; % X-Y SWAPPED per DYNA specification
-    latmax = phantom.PPARAMS.ymax*1e-2;
+    latmax = phantom.PPARAMS.ymax*1e-2; % cm --> m
     elevmin = phantom.PPARAMS.xmin*1e-2;
     elevmax = phantom.PPARAMS.xmax*1e-2;
     axmin = phantom.PPARAMS.zmin*1e-2;
@@ -58,7 +58,7 @@ else,
     y = y-mean(y) + 0.5*(elevmin+elevmax);
     z = z-mean(z) + 0.5*(axmin+axmax);
 
-    [Z X Y] = ndgrid(-1*z,x,y);
+    [Z X Y] = ndgrid(-1*z,x,y); % ndgrid dimension z x y
     V = 0*X;
     for i = 1:length(X(:));
     [v, starttime] = calc_scat(tx,rx,[X(i) Y(i) Z(i)],1);
@@ -68,11 +68,11 @@ else,
     V = convn(V,ones(3,3,3)./9,'same'); %PSF?
     V = db(V./max(V(:)));
 
-     P = [2 1 3];
-       X = permute(X, P);
-       Y = permute(Y, P);
-       Z = permute(Z, P);
-       V = permute(V, P);
+    P = [2 1 3];
+    X = permute(X, P); % meshgrid dimension x z y
+    Y = permute(Y, P);
+    Z = permute(Z, P);
+    V = permute(V, P);
 
     V1 = interp3(Z,X,Y,V,double(phantom.position(:,3)), ...
                          double(phantom.position(:,1)), ...

@@ -1,4 +1,4 @@
-function [pulse,varargout]=uf_txp(waveform,varargin);
+function [pulse,varargout]=uf_txp(waveform,varargin)
 
 %
 % uf_txp - function to generate impulse response sequences
@@ -26,26 +26,26 @@ t=[];
 if isnumeric(waveform)
     pulse=waveform;
     t=1/varargin{1}*(0:length(pulse)-1);
-end;
+end
 
 if ischar(waveform)
     fs = varargin{1};
-    if ~(strcmp('impulse',lower(waveform)))
+    if ~(strcmpi('impulse',waveform))
         f0 = varargin{2};
         num_cycles = varargin{3};
         p = varargin{4};
-    end;
-end;
+    end
+end
 
 if isstruct(waveform)
     fs=varargin{1};
-    if ~(strcmp('impulse',lower(waveform.wavetype)))
+    if ~(strcmpi('impulse',waveform.wavetype))
         f0=waveform.f0;
         p=waveform.phase;
         num_cycles=waveform.num_cycles;
-    end;
+    end
     waveform=waveform.wavetype; % and you've just made waveform type char
-end;
+end
 
 
 % so this executes if you supplied a structure or string
@@ -63,9 +63,9 @@ if ischar(waveform)
         case 'impulse'
             t=0;
             pulse=1;        
-    end;
-end;
+    end
+end
 
 if nargout>1
     varargout{1}=t;
-end;
+end
