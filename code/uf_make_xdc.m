@@ -22,12 +22,14 @@ function [Tx,Rx]=uf_make_xdc(geometry)
 % Set sampling frequency
 
 set_field('fs',geometry.field_sample_freq);
+set_field('c',geometry.c);
 
 if (strcmp('linear',geometry.probe_type) || strcmp('phased',geometry.probe_type))
 
 	% Set up a linear or phased array
 
-	% Create transmit and receive apertures with specified geometry
+	% Create transmit and receive apertures with specified geometry &
+	% initial focus
 	Tx = xdc_focused_array(geometry.no_elements,geometry.width,geometry.height,geometry.kerf,geometry.elv_focus,geometry.no_sub_x,geometry.no_sub_y, [0 0 geometry.elv_focus]);
 
 	Rx = xdc_focused_array(geometry.no_elements,geometry.width,geometry.height,geometry.kerf,geometry.elv_focus,geometry.no_sub_x,geometry.no_sub_y, [0 0 geometry.elv_focus]);

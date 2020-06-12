@@ -9,3 +9,6 @@ ultra_driver.m~
 phantom_sym_h_N_58000_seed_0_rand_scat_amp_1_delta_0_0_0_X_-10_10_Y_-5_0_Z_1_30/
 phantom_sym_h_N_200_seed_0_rand_scat_amp_1_delta_0_0_0_X_-10_10_Y_-5_5_Z_20_30/
 external/
+phantom_sym_h_N_200_seed_0_rand_scat_amp_NaN_delta_0_0_0_X_-10_10_Y_-5_5_Z_20_30/
+code/uf_set_beam_planewave.m~
+

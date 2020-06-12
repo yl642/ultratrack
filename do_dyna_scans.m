@@ -110,7 +110,7 @@ beamset.tx_excitation.num_cycles=TX_NUM_CYCLES;
 beamset.tx_excitation.phase=0;
 beamset.tx_excitation.wavetype='Square';
 beamset.prf=NaN;
-beamset.tx_apod_type=1; % Hamming apodization, select 0 for rectangular
+beamset.tx_apod_type=PARAMS.tx_apod_type; % Hamming apodization, select 0 for rectangular
 
 beamset.is_dyn_focus = (RX_FOCUS==0);	% If RX_FOCUS is spec'd zero, use	
 					        % dynamic focus

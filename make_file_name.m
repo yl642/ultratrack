@@ -29,17 +29,19 @@ switch type
         P = rmfield(P,{'XMIN','XMAX','XSTEP','YMIN','YMAX','YSTEP','PHIMIN','PHIMAX','PHISTEP','THMIN','THSTEP','THMAX'});
         P.NO_BEAMS = sprintf('%g_%g',P.NO_BEAMS_X,P.NO_BEAMS_Y);
         P = rmfield(P,{'NO_BEAMS_X','NO_BEAMS_Y'});
-        P.NPAR = sprintf('%g_%g',P.NO_PARALLEL(1),P.NO_PARALLEL(2));
-        P.PSPACE = sprintf('%g_%g',P.PARALLEL_SPACING(1),P.PARALLEL_SPACING(2));
-        P = rmfield(P,{'NO_PARALLEL','PARALLEL_SPACING'});
+%         P.NPAR = sprintf('%g_%g',P.NO_PARALLEL(1),P.NO_PARALLEL(2));
+%         P.PSPACE = sprintf('%g_%g',P.PARALLEL_SPACING(1),P.PARALLEL_SPACING(2));
+%         P = rmfield(P,{'NO_PARALLEL','PARALLEL_SPACING'});
         P.APEX = sprintf('%g',1e3*P.APEX);
         P.TX_FOCUS = sprintf('%g',1e3*P.TX_FOCUS);
         P.TX_FREQ = sprintf('%g',1e-6*P.TX_FREQ);
         P.FS = sprintf('%g',1e-6*P.field_sample_freq);
         P = rmfield(P,'field_sample_freq');
         P.RX_FOCUS = sprintf('%g',1e3*P.RX_FOCUS);
-        P.TX_F_NUM = sprintf('%g_%g',P.TX_F_NUM(1),P.TX_F_NUM(2));
-        P.RX_F_NUM = sprintf('%g_%g',P.RX_F_NUM(1),P.RX_F_NUM(2));
+%         P.TX_F_NUM = sprintf('%g_%g',P.TX_F_NUM(1),P.TX_F_NUM(2));
+%         P.RX_F_NUM = sprintf('%g_%g',P.RX_F_NUM(1),P.RX_F_NUM(2));
+        P.TX_F_NUM = sprintf('%g',P.TX_F_NUM);
+        P.RX_F_NUM = sprintf('%g',P.RX_F_NUM);
 end
 
 s=fieldnames(P);
