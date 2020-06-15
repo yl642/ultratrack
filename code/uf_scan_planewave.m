@@ -12,23 +12,24 @@ rfdata=zeros(1,beamset.no_beams,beamset.no_beamsy,beamset.no_parallel);
 tic
 
 for n_vector=1:beamset.no_beams
-    fprintf('Processing Vector Lat %d of %d\n',n_vector, beamset.no_beams);
+    fprintf('Processing PlaneWave Scan %d of %d\n',n_vector, beamset.no_beams);
     
     for p_vector = 1:beamset.no_parallel
+        fprintf('Processing Vector Lat %d of %d\n',p_vector, beamset.no_parallel);
         % Make transmit and receive apertures as defined by probe
         [tx, rx]=uf_make_xdc(probe);
 
         toffset = uf_set_beam_planewave(tx, rx, probe, beamset, 1, n_vector, 1, p_vector);
 
-        [red_phantom] = reduce_scats(phantom, tx, rx, beamset.minDB);
-%         red_phantom = phantom;
+%         [red_phantom] = reduce_scats(phantom, tx, rx, beamset.minDB);
+        red_phantom = phantom;
 
         [v,t1]=calc_scat(tx, rx, red_phantom.position, red_phantom.amplitude);
 
         t1 = t1 - toffset; % actually not sure how to set toffset
         
         if (size(rfdata,1)<length(v))
-            disp('Memory');
+%             disp('Memory');
             rfdata=[rfdata ;zeros(length(v)-size(rfdata,1),beamset.no_beams,beamset.no_beamsy,beamset.no_parallel) ];
         end
         

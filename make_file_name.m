@@ -23,9 +23,9 @@ switch type
     case 'rf'
         P = rmfield(PARAMS,{'RXOFFSET','BEAM_ORIGIN_X','BEAM_ORIGIN_Y','BEAM_ANGLE_X','BEAM_ANGLE_Y','COMPUTATIONMETHOD'});
         P.X = sprintf('%g_%g_%g',1e3*P.XMIN,1e3*P.XSTEP,1e3*P.XMAX);
-        P.Y = sprintf('%g_%g_%g',1e3*P.YMIN,1e3*P.YSTEP,1e3*P.YMAX);
-        P.PHI = sprintf('%g_%g_%g',P.PHIMIN,P.PHISTEP,P.PHIMAX);
-        P.THETA = sprintf('%g_%g_%g',P.THMIN,P.THSTEP,P.THMAX);
+%         P.Y = sprintf('%g_%g_%g',1e3*P.YMIN,1e3*P.YSTEP,1e3*P.YMAX);
+%         P.PHI = sprintf('%g_%g_%g',P.PHIMIN,P.PHISTEP,P.PHIMAX);
+%         P.THETA = sprintf('%g_%g_%g',P.THMIN,P.THSTEP,P.THMAX);
         P = rmfield(P,{'XMIN','XMAX','XSTEP','YMIN','YMAX','YSTEP','PHIMIN','PHIMAX','PHISTEP','THMIN','THSTEP','THMAX'});
         P.NO_BEAMS = sprintf('%g_%g',P.NO_BEAMS_X,P.NO_BEAMS_Y);
         P = rmfield(P,{'NO_BEAMS_X','NO_BEAMS_Y'});

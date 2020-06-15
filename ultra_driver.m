@@ -70,7 +70,7 @@ PARAMS.c = 1540;                    % sound speed (m/s)
 
 % TRACKING BEAM PARAMETERS
 % tx
-PARAMS.TX_FOCUS_ANGLE = 0;          % 1D probe, plane wave imaging (deg)
+PARAMS.TX_FOCUS_ANGLE = [-3 0 3];          % 1D probe, plane wave imaging (deg)
 PARAMS.TX_FOCUS_R = NaN;            % Tramsmit focus depth. if diverging or converging wave (m)
 if ~isnan(PARAMS.TX_FOCUS_R)
     PARAMS.TX_FOCUS = [PARAMS.TX_FOCUS_R*sind(PARAMS.TX_FOCUS_ANGLE) 0 PARAMS.TX_FOCUS_R*cosd(PARAMS.TX_FOCUS_ANGLE)];
