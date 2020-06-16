@@ -70,7 +70,7 @@ PARAMS.c = 1540;                    % sound speed (m/s)
 
 % TRACKING BEAM PARAMETERS
 % tx
-PARAMS.TX_FOCUS_ANGLE = [-3 0 3];          % 1D probe, plane wave imaging (deg)
+PARAMS.TX_FOCUS_ANGLE = [-3 0 3];   % 1D probe, plane wave imaging (deg)
 PARAMS.TX_FOCUS_R = NaN;            % Tramsmit focus depth. if diverging or converging wave (m)
 if ~isnan(PARAMS.TX_FOCUS_R)
     PARAMS.TX_FOCUS = [PARAMS.TX_FOCUS_R*sind(PARAMS.TX_FOCUS_ANGLE) 0 PARAMS.TX_FOCUS_R*cosd(PARAMS.TX_FOCUS_ANGLE)];
@@ -83,7 +83,6 @@ else
 end
 
 PARAMS.TX_F_NUM = 0;                % zero for full array
-% PARAMS.TX_FREQ = 5e6;             % Transmit frequency (Hz)
 PARAMS.TX_FREQ = 5.2e6;             % Transmit frequency (Hz)
 PARAMS.TX_NUM_CYCLES = 2;           % Number of cycles in transmit toneburst
 PARAMS.tx_apod_type = 0;            % 1 for Hamming apodization, 0 for rectangular
@@ -108,14 +107,14 @@ PARAMS.APEX = 0;                % Apex of scan geometry; 0 for linear scanning
 PARAMS.RX_FOCUS = 0;            % Depth of receive focus - use 0 for dynamic Rx
 PARAMS.RX_F_NUM = 1;            % Zero for full array
 PARAMS.rx_apod_type = 1;        % 1 for Hamming apodization, 0 for rectangular
-PARAMS.RX_GROW_APERTURE=0;      % Not actually implemented!
+PARAMS.RX_GROW_APERTURE = 0;    % Not actually implemented!
 PARAMS.MINDB = -20;             % Min dB to include a scat in reduction (NaN to disable)
 
 PARAMS = planewave_tx_rx(PARAMS); % Tx & Rx beam override possible with 1s
 
 %% ------------- GENERATE RF SCANS OF SCATTERER FIELDS -------------------
-RF_DIR=[make_file_name('rf', [PHANTOM_DIR 'rf'], PARAMS) '/'];
-RF_FILE=[RF_DIR 'rf'];
+RF_DIR = [make_file_name('rf', [PHANTOM_DIR 'rf'], PARAMS) '/'];
+RF_FILE = [RF_DIR 'rf'];
 mkdir(RF_DIR);
 field_init(-1);
 do_dyna_scans_planewave(PHANTOM_FILE, RF_FILE, PARAMS);

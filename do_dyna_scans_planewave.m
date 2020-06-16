@@ -1,6 +1,6 @@
 function do_dyna_scans_planewave(PHANTOM_FILE,OUTPUT_FILE,PARAMS)
 %
-% do_dyna_scans_planewave(PHANTOM_FILE,OUTPUT_FILE,PARAMS);
+% do_dyna_scans_planewave(PHANTOM_FILE,OUTPUT_FILE,PARAMS)
 %
 % Function for doing ARFI scans with the URI/Field toolkit 
 %
@@ -16,25 +16,28 @@ function do_dyna_scans_planewave(PHANTOM_FILE,OUTPUT_FILE,PARAMS)
 %
 % PARAMS	structure with the following entries:
 %
-% PARAMS.PROBE_NAME		Name of text file containing probe description
-% PARAMS.IMAGE_MODE             'linear' or 'phased'
-% PARAMS.XMIN			Leftmost scan line
-% PARAMS.XSTEP			Scanline spacing
-% PARAMS.XMAX			Rightmost scan line
-% PARAMS.TX_FOCUS		Transmit focus depth
-% PARAMS.TX_FNUM		Transmit f number (lateral & elevation)
-% PARAMS.TX_FREQ		Transmit frequency
+% PARAMS.PROBE              Name of text file containing probe description
+% PARAMS.TX_FOCUS_ANGLE     Planewave tilting angles
+% PARAMS.XMIN               Leftmost scan RX line
+% PARAMS.XSTEP              RX scanline spacing
+% PARAMS.XMAX               Rightmost scan RX line
+% PARAMS.TX_FREQ            Transmit frequency
 % PARAMS.TX_NUM_CYCLES		Number of cycles in transmit toneburst
-% PARAMS.RX_FOCUS		Depth of receive focus - use zero for dyn. foc
-% PARAMS.RX_FNUM		Receive aperture f number (lateral & elevation)
+% PARAMS.RX_FOCUS           Depth of receive focus - use zero for dyn. foc
+% PARAMS.RX_FNUM            Receive aperture f number
 % PARAMS.RX_GROW_APERTURE	1 means use aperture growth, 0 means don't
-% PARAMS.TXOFFSET               Spatial offset for Tx beam (from Rx) for parallel rx
+% PARAMS.RXOFFSET           Spatial offset for RX for plabewave receiving
 %
 % The uf_scan() call has been modified to allow for parallel rx
 % simulations, by passing PARAMS.RXOFFSET to uf_scan() that
 % is then passed to uf_set_beam() to laterally offset the Rx
 % beam from the Tx beam.  This is also passed to uf_make_xdc().
 % Mark 06/16/05
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% This version is for planewave imaging, thus disabled parallel rx
+% Yangpei 06/15/20
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ADD PATHS FOR CODE AND PROBES
@@ -48,14 +51,14 @@ BEAM_ORIGIN_X = PARAMS.BEAM_ORIGIN_X;
 BEAM_ORIGIN_Y = PARAMS.BEAM_ORIGIN_Y;
 BEAM_ANGLE_X = PARAMS.BEAM_ANGLE_X;
 BEAM_ANGLE_Y = PARAMS.BEAM_ANGLE_Y;
-TX_FOCUS = PARAMS.TX_FOCUS;	% Tramsmit focus depth
-TX_FNUM=PARAMS.TX_F_NUM;	% Transmit f number
-TX_FREQ=PARAMS.TX_FREQ;		% Transmit frequency
-TX_NUM_CYCLES=PARAMS.TX_NUM_CYCLES;	% Number of cycles in transmit toneburst
-RX_FOCUS=PARAMS.RX_FOCUS;	% Depth of receive focus - use zero for dyn. foc
-RX_FNUM=PARAMS.RX_F_NUM;	% Receive aperture f number
-RX_GROW_APERTURE=PARAMS.RX_GROW_APERTURE;	  % 1=grow, 0 = static 
-RXOFFSET = PARAMS.RXOFFSET;     % Lateral,Elevation,Angle_X and Angle_Y offset of Tx beam from Rx beam (m)
+TX_FOCUS = PARAMS.TX_FOCUS;
+TX_FNUM = PARAMS.TX_F_NUM;
+TX_FREQ = PARAMS.TX_FREQ;
+TX_NUM_CYCLES = PARAMS.TX_NUM_CYCLES;
+RX_FOCUS = PARAMS.RX_FOCUS;
+RX_FNUM = PARAMS.RX_F_NUM;
+RX_GROW_APERTURE = PARAMS.RX_GROW_APERTURE;
+RXOFFSET = PARAMS.RXOFFSET;
 APEX = PARAMS.APEX;
 MINDB = PARAMS.MINDB;
 % END PARAMETERS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -64,17 +67,15 @@ if ~strcmp(PROBE_NAME(end-3:end),'.txt')
     PROBE_NAME = [PROBE_NAME '.txt'];
 end
 % Create probe structure for specified probe
-probe=uf_txt_to_probe(PROBE_NAME);
-probe.field_sample_freq=PARAMS.field_sample_freq;
+probe = uf_txt_to_probe(PROBE_NAME);
+probe.field_sample_freq = PARAMS.field_sample_freq;
 probe.c = PARAMS.c;
 
 % Create beamset based on params above
 beamset.type='B';
 beamset.originx=BEAM_ORIGIN_X';
 beamset.originy=BEAM_ORIGIN_Y';
-if(isempty(beamset.originy))
-   beamset.originy=0;
-end
+
 beamset.directionx=BEAM_ANGLE_X';
 beamset.directiony=BEAM_ANGLE_Y';
 
@@ -93,26 +94,22 @@ elseif length(beamset.originy)>1 && length(beamset.directiony)==1
 end
 
 beamset.tx_focus_range=TX_FOCUS(3);
-beamset.tx_f_num=TX_FNUM(1);
+beamset.tx_f_num=TX_FNUM;
 beamset.tx_excitation.f0=TX_FREQ;
 beamset.tx_excitation.num_cycles=TX_NUM_CYCLES;
 beamset.tx_excitation.phase=0;
 beamset.tx_excitation.wavetype='Square';
 beamset.prf=NaN;
-beamset.tx_apod_type=PARAMS.tx_apod_type;   % Hamming apodization, select 0 for rectangular
-
-beamset.is_dyn_focus = (RX_FOCUS==0);       % If RX_FOCUS is spec'd zero, use	
-                                            % dynamic focus
-beamset.rx_focus_range=RX_FOCUS;            % Receive focal point,zero=dynamic
-beamset.rx_apod_type=PARAMS.rx_apod_type;   % 1=Hamming, 0 = rectangular apodization
+beamset.tx_apod_type=PARAMS.tx_apod_type;   % 1 for Hamming apodization, 0 for rectangular
+beamset.is_dyn_focus=(RX_FOCUS==0);       % If RX_FOCUS is spec'd zero, use dynamic focus
+beamset.rx_focus_range=RX_FOCUS;            % Receive focal point, zero=dynamic
+beamset.rx_apod_type=PARAMS.rx_apod_type;   % 1 for Hamming apodization, 0 for rectangular
 beamset.rx_f_num=RX_FNUM;
 beamset.aperture_growth=RX_GROW_APERTURE;
-beamset.apex= APEX;
-beamset.no_parallel = size(RXOFFSET,1);
-beamset.rx_offset = RXOFFSET;
-
+beamset.apex=APEX;
+beamset.no_parallel=size(RXOFFSET,1);
+beamset.rx_offset=RXOFFSET;
 beamset.minDB = MINDB;
-
 
 % Extract the pathname, if any, from PHANTOM_FILE
 slashes=regexp(PHANTOM_FILE,'/'); % slashes has indicies of occurances of '/'

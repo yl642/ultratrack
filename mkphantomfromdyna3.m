@@ -1,50 +1,51 @@
-function varargout = mkphantomfromdyna3(DYN_FILE, ZDISPFILE, OUTPUT_NAME, PPARAMS, LEGACY_NODES);
-% function varargout = mkphantomfromdyna3(DYN_FILE, ZDISPFILE, OUTPUT_NAME, PPARAMS);
+function varargout = mkphantomfromdyna3(DYN_FILE, ZDISPFILE, OUTPUT_NAME, PPARAMS, LEGACY_NODES)
+% function varargout = mkphantomfromdyna3(DYN_FILE, ZDISPFILE, OUTPUT_NAME, PPARAMS)
 %
 % Function for reading .dyn and zdisp files and generating displaced
 % scatterers for Field.  Function saves phantom structures compatible
 % with the URI/Field II toolkit
 %
-% DYN_FILE: 	.dyn file name. Will be appended with timestep
-% 		in %03d format, e.g. 'phantom002'
+% DYN_FILE: 	name of .dyn file containing mesh configuration 
 %
 % ZDISPFILE:	name of matlab file containing zdisp
 %
-% OUTPUT_NAME:	name of output file containing phantom
+% OUTPUT_NAME:	name of output file containing phantom. Will be appended 
+%               with timestep in %03d format, e.g. 'phantom002'
 %
-% PPARAMS: 	structure with the following fields:
-% 	N:		number of scatteres to create
+% PPARAMS:      structure with the following fields:
+%   N:          Number of scatteres to create.
 % 	xmin, xmax,
 % 	ymin, ymax,
 % 	zmin, zmax:	Minimum and maximum spatial extent of scatters.
-% 			Leave any empty to use the corresponding mesh
-%			dimension as the limit
-% 			NOTE!!! THESE ARE DYNA'S UNITS HERE!!!
-% 			NOTE ALSO!! THIS IS DYNA COORDINATE SYSTEM!
-% 			Z=AXIAL, Y = LATERAL, X=OUT OF PLANE
-% 			In contrast, in field it's z axial,
-%			y out of plane, and x lateral
-% 			X and Y are swapped in scatterer output
+%               Leave any empty to use the corresponding mesh
+%               dimension as the limit.
+%               NOTE!!! THESE ARE DYNA'S UNITS HERE!!!
+%               NOTE ALSO!! THIS IS DYNA COORDINATE SYSTEM!
+%               Z=AXIAL, Y = LATERAL, X=OUT OF PLANE
+%               In contrast, in field it's z axial,
+%               y out of plane, and x lateral,
+%               X and Y are swapped in scatterer output.
 %
-% 	TIMESTEP 	Vector of timesteps for which to generate scatterer
-% 			Use empty vector to simulate all time steps
+% 	TIMESTEP: 	Vector of timesteps for which to generate scatterer.
+%               Use empty vector to simulate all time steps
 %
-%	seed		Seed state to use for random number generator.
-%			Phantoms with identical N, dimensions, and seed
-%			have identical inital scatterer positions
+%	seed:		Seed state to use for random number generator.
+%               Phantoms with identical N, dimensions, and seed
+%               have identical inital scatterer positions.
 %
-%	delta		rigid displacement added to all scatterer positions
-%			before zdisp displacements are applied. A 1x3 vector
-%			in the DYNA coordinate and unit system	
+%	delta:		Rigid displacement added to all scatterer positions
+%               before zdisp displacements are applied. A 1x3 vector
+%               in the DYNA coordinate and unit system	
 
-if nargin < 5,LEGACY_NODES = 0;end
+if nargin < 5, LEGACY_NODES = 0; end
 
-FD_RATIO=0.01;  % What to mutiply dyna units by (cm) to
-			    % get field units (m), here 100cm*0.01=1m
+FD_RATIO = 0.01;  % What to mutiply dyna units (cm) by to
+                  % get field units (m), here 100 cm * 0.01 = 1 m.
 
 % Read the .dyn file to get node positions
-fprintf('Loading %s...\n',DYN_FILE);
+fprintf('Loading %s...\n', DYN_FILE);
 [nodes, X, Y, Z] = read_dot_dyn(DYN_FILE); % read from FEM
+disp('Done.')
 
 % Create scatterers in specified volume with explicitly seeded random generator
 % to ensure identical scatterer location in subsequent runs if needed
@@ -69,7 +70,7 @@ NUM_TIMESTEPS = fread(zdisp_fid, 1, 'float32');
 
 % Decide on timesteps to use
 if isempty(PPARAMS.TIMESTEP)
-    PPARAMS.TIMESTEP=1:NUM_TIMESTEPS;
+    PPARAMS.TIMESTEP = 1:NUM_TIMESTEPS;
 end
 
 word_size = 4; %float32
@@ -79,18 +80,17 @@ first_timestep_bytes = NUM_NODES*(NUM_DIMS)*word_size; %NUM_DIMS = 4: id, x, y, 
 timestep_bytes = NUM_NODES*(NUM_DIMS-1)*word_size;
 
 % Generate displaced scatterers for each timestep
-for t=PPARAMS.TIMESTEP
+for t = PPARAMS.TIMESTEP
     % Get the displacement matricies
     fprintf('Extracting displacements for timestep %d...\n',t);
+    
     if (t == 1) || LEGACY_NODES
-        
         % extract the zdisp values for the appropriate time step
         fseek(zdisp_fid,header_bytes+first_timestep_bytes*(t-1),-1);
         zdisp_slice = fread(zdisp_fid,first_timestep_words,'float32');
         zdisp_slice = double(reshape(zdisp_slice,NUM_NODES,NUM_DIMS));
         node_readout = zdisp_slice(:,1);
-    else
-        
+    else  
         % extract the zdisp values for the appropriate time step
         fseek(zdisp_fid,header_bytes+first_timestep_bytes+timestep_bytes*(t-2),-1);
         zdisp_slice = fread(zdisp_fid,NUM_NODES*(NUM_DIMS-1),'float32');
@@ -147,9 +147,9 @@ for t=PPARAMS.TIMESTEP
     
     %Include evenly spaced bright scatterers (if requested)
     if isfield(PPARAMS,'pointscatterers')
-        [xpos ypos zpos] = ndgrid(PPARAMS.pointscatterers.x, ...
-                                  PPARAMS.pointscatterers.y, ...
-                                  PPARAMS.pointscatterers.z);
+        [xpos, ypos, zpos] = ndgrid(PPARAMS.pointscatterers.x, ...
+                                    PPARAMS.pointscatterers.y, ...
+                                    PPARAMS.pointscatterers.z);
         wire_positions = [xpos(:) ypos(:) zpos(:)]; %xyz Scatterer Locations [m]
         wire_amplitudes = PPARAMS.pointscatterers.a*ones(size(wire_positions,1),1);
         phantom.position = [phantom.position; wire_positions];

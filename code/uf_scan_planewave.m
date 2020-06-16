@@ -21,8 +21,8 @@ for n_vector=1:beamset.no_beams
 
         toffset = uf_set_beam_planewave(tx, rx, probe, beamset, 1, n_vector, 1, p_vector);
 
-%         [red_phantom] = reduce_scats(phantom, tx, rx, beamset.minDB);
-        red_phantom = phantom;
+        [red_phantom] = reduce_scats(phantom, tx, rx, beamset.minDB);
+%         red_phantom = phantom;
 
         [v,t1]=calc_scat(tx, rx, red_phantom.position, red_phantom.amplitude);
 
@@ -30,7 +30,7 @@ for n_vector=1:beamset.no_beams
         
         if (size(rfdata,1)<length(v))
 %             disp('Memory');
-            rfdata=[rfdata ;zeros(length(v)-size(rfdata,1),beamset.no_beams,beamset.no_beamsy,beamset.no_parallel) ];
+            rfdata=[rfdata ;zeros(length(v)-size(rfdata,1),beamset.no_beams,beamset.no_beamsy,beamset.no_parallel)];
         end
         
         rfdata(1:length(v),n_vector,1,p_vector)=v;
